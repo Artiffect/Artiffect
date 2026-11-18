@@ -78,15 +78,13 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/h04-dark.svg">
-  <img src="assets/h04-light.svg" width="100%" alt="04 wakatime">
+  <img src="assets/h04-light.svg" width="100%" alt="04 git log">
 </picture>
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/wakatime-dark.svg">
-    <img src="assets/wakatime-light.svg" width="495" alt="WakaTime — coding time in the last 7 days">
-  </picture>
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/gitlog-dark.svg">
+  <img src="assets/gitlog-light.svg" width="100%" alt="git log — recent public commits">
+</picture>
 
 <br><br>
 
@@ -106,13 +104,15 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/h06-dark.svg">
-  <img src="assets/h06-light.svg" width="100%" alt="06 pac-man">
+  <img src="assets/h06-light.svg" width="100%" alt="06 fortune">
 </picture>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/pacman-dark.svg">
-  <img src="assets/pacman-light.svg" width="100%" alt="Pac-Man eating the contribution graph">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/fortune-dark.svg">
+    <img src="assets/fortune-light.svg" width="495" alt="fortune — developer quote of the day">
+  </picture>
+</p>
 
 <br><br>
 

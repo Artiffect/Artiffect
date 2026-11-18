@@ -1,14 +1,11 @@
 """README에 필요한 데이터를 받아 data/ 폴더에 저장한다. (그리기는 render.py가 한다)
 
     data/avatar.png     프로필 사진
-    data/github.json    잔디·통계·언어 비율·최근 저장소
-    data/wakatime.json  지난 7일 언어별 코딩 시간   (WAKATIME_TOKEN 이 있을 때만)
+    data/github.json    잔디·통계·언어 비율·최근 저장소·최근 커밋
     data/spotify.json   가장 최근 들은 곡 + 앨범 커버  (SPOTIFY_* 세 개가 있을 때만)
 
 환경 변수
     GITHUB_TOKEN            필수. Actions에선 자동으로 들어오고, 로컬에선 `gh auth token` 값.
-    WAKATIME_TOKEN          선택. wakatime.com/oauth 에서 받은 개인 OAuth 토큰 (waka_tok_…, read_stats 권한)
-                            ※ API 키(waka_…)는 플러그인 전용이라 통계를 읽을 수 없어요.
     SPOTIFY_CLIENT_ID       선택. Spotify 개발자 앱
     SPOTIFY_CLIENT_SECRET   선택.
     SPOTIFY_REFRESH_TOKEN   선택. user-read-recently-played 권한으로 받은 refresh token
@@ -127,6 +124,12 @@ def fetch_github(login, token, exclude):
     recent = [{"id": r["id"], "name": r["name"], "pushed_at": r["pushed_at"]}
               for r in repos if r["name"] not in exclude][:5]
 
+    # 최근 공개 커밋 5개 (프로필 저장소 제외) — git log 카드용
+    found = gh(f"/search/commits?q=author:{login}+-repo:{login}/{login}&sort=author-date&order=desc&per_page=5")
+    recent_commits = [{"sha": c["sha"][:7], "msg": c["commit"]["message"].split("\n")[0],
+                       "repo": c["repository"]["name"], "date": c["commit"]["author"]["date"]}
+                      for c in found.get("items", [])]
+
     # 프사
     urllib.request.urlretrieve(user["avatarUrl"], DATA / "avatar.png")
     print("  wrote data/avatar.png")
@@ -141,16 +144,7 @@ def fetch_github(login, token, exclude):
         "weeks": weeks,
         "languages": top,
         "recent_repos": recent,
-    })
-
-
-# ---------------------------------------------------------------- WakaTime
-def fetch_wakatime(token):
-    res = request("https://wakatime.com/api/v1/users/current/stats/last_7_days", token=token)["data"]
-    write_json("wakatime.json", {
-        "total": res.get("human_readable_total", ""),
-        "languages": [{"name": l["name"], "text": l["text"], "percent": l["percent"]}
-                      for l in res.get("languages", [])[:5]],
+        "recent_commits": recent_commits,
     })
 
 
@@ -179,17 +173,18 @@ def fetch_spotify(client_id, client_secret, refresh_token):
         tracks.append({"title": tr["name"],
                        "artist": ", ".join(a["name"] for a in tr["artists"]),
                        "played_at": i["played_at"],
+                       "duration": "{}:{:02d}".format(*divmod(round(tr.get("duration_ms", 0) / 1000), 60)),
                        "cover": cover_data_uri(pick["url"]) if pick else None})
     write_json("spotify.json", {"tracks": tracks})
 
 
 # ---------------------------------------------------------------- main
 def optional(name, fn, *args):
-    """WakaTime·Spotify 는 실패해도 전체를 멈추지 않는다. 경고만 남기고 해당 카드는 '기록 없음'으로 그린다."""
+    """Spotify 는 실패해도 전체를 멈추지 않는다. 경고만 남기고 해당 카드는 '기록 없음'으로 그린다."""
     try:
         fn(*args)
     except urllib.error.HTTPError as e:
-        hint = {401: "키가 틀렸거나 만료됐어요", 403: "권한이 없어요. WakaTime은 개인 OAuth 토큰(read_stats)이 필요해요"}
+        hint = {401: "키가 틀렸거나 만료됐어요", 403: "권한이 없어요. 토큰 권한(scope)을 확인하세요"}
         body = e.read()[:300].decode("utf-8", "replace").replace("\n", " ")  # 서버가 알려 주는 이유 (키는 들어 있지 않음)
         print(f"::warning::{name} 요청 실패 HTTP {e.code} — {hint.get(e.code, '잠시 뒤 다시 시도됩니다')} | 응답: {body}")
     except Exception as e:  # 네트워크 오류 등
@@ -206,12 +201,6 @@ def main():
         sys.exit("GITHUB_TOKEN 이 필요해요. 로컬에선: GITHUB_TOKEN=$(gh auth token) python scripts/fetch.py")
     print("GitHub")
     fetch_github(cfg["github"], token, set(cfg.get("btop_exclude", [])))
-
-    print("WakaTime")
-    if env("WAKATIME_TOKEN"):
-        optional("WakaTime", fetch_wakatime, env("WAKATIME_TOKEN"))
-    else:
-        print("  WAKATIME_TOKEN 없음 → 건너뜀")
 
     print("Spotify")
     spotify = [env("SPOTIFY_CLIENT_ID"), env("SPOTIFY_CLIENT_SECRET"), env("SPOTIFY_REFRESH_TOKEN")]

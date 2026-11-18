@@ -26,9 +26,9 @@ sections:
   - { title: tech stack,   path: ~/stack }
   - { title: github stats, path: ~/stats }
   - { title: activity,     path: ~/activity }
-  - { title: wakatime,     path: ~/wakatime }
+  - { title: git log,      path: ~/commits }
   - { title: spotify,      path: ~/spotify }
-  - { title: pac-man,      path: ~/pacman }
+  - { title: fortune,      path: ~/fortune }
 
 # btop 프로세스 목록에서 뺄 저장소
 btop_exclude:

@@ -3,8 +3,9 @@
     assets/hero-{dark,light}.svg      상단 터미널 (Last login + 파워라인 프롬프트 + neofetch + 프사 ASCII)
     assets/btop-{dark,light}.svg      btop (잔디 그래프 · 언어 비율 · 최근 저장소)
     assets/h01-{dark,light}.svg ...   섹션 제목 (파워라인 칸)
-    assets/wakatime-{dark,light}.svg  지난 7일 코딩 시간
-    assets/spotify-{dark,light}.svg   최근 들은 곡
+    assets/gitlog-{dark,light}.svg    최근 공개 커밋 (git log)
+    assets/spotify-{dark,light}.svg   마지막으로 들은 곡 (플레이어)
+    assets/fortune-{dark,light}.svg   오늘의 개발 명언
     assets/footer-{dark,light}.svg    마무리 (exit)
 
 규칙: 터미널 글자는 전부 같은 고정폭 글꼴 · 14px · 같은 줄 간격. 분홍은 프롬프트와 포인트에만.
@@ -308,78 +309,98 @@ def heading(t, num, title, path):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="34" viewBox="0 0 {W} 34">{STYLE}{svg}</svg>'
 
 
-# ================================================================ 4. WakaTime (작은 창 495px)
-def short_time(s):
-    """'12 hrs 30 mins' → '12h 30m'"""
-    for a, b in ((" hrs", "h"), (" hr", "h"), (" mins", "m"), (" min", "m"), (" secs", "s"), (" sec", "s")):
-        s = s.replace(a, b)
-    return s
+# ================================================================ 4. git log (너비 가득)
+def gitlog(t, cfg, gh, now):
+    """❯ git log --oneline -5 : 최근 공개 커밋 (프로필 저장소 제외)"""
+    commits = gh.get("recent_commits") or []
+    cells = int((W - 2 * 18) / 7.8)          # 13px 글자 기준 한 줄 칸 수
+    body = [text(18, 60, [("❯ ", t["pink"], True), ("git log --oneline -5", t["fg"], False)])]
+    if not commits:
+        body.append(text(18, 88, [("No public commits yet.", t["dim"], False)], size=13))
+        return window(t, 108, "git", "\n  ".join(body))
+    for i, c in enumerate(commits):
+        y = 88 + i * 20
+        right = f"{c['repo']} · {ago(c['date'], now)}"
+        msg = clip(c["msg"], cells - 9 - width(right) - 2)
+        body.append(text(18, y, [(c["sha"] + "  ", t["lav"], False), (msg, t["fg"], False)], size=13, delay=.2 + i * .05))
+        body.append(text(W - 18, y, [(right, t["dim"], False)], size=13, anchor="end", delay=.2 + i * .05))
+    return window(t, 88 + (len(commits) - 1) * 20 + 22, "git", "\n  ".join(body))
 
 
-def wakatime(t, cfg, waka, now):
-    """❯ wakatime --last-7-days / 한 줄짜리 색 막대 / 2열 범례 (■ Java 12h 30m)"""
-    w, x0 = 495, 18
-    bw = w - 2 * x0
-    langs = ((waka or {}).get("languages") or [])[:4]
-    body = [text(x0, 60, [("❯ ", t["pink"], True), ("wakatime --last-7-days", t["fg"], False)])]
-    # 막대: 언어 비율대로 이어 붙인 한 줄 (데이터가 없으면 빈 트랙만)
-    body.append(f'<rect x="{x0}" y="76" width="{bw}" height="8" rx="2" fill="{t["track"]}"/>')
-    x, total = x0, sum(l["percent"] for l in langs) or 100
-    for l, color in zip(langs, t["langs"]):
-        lw = bw * l["percent"] / 100
-        body.append(f'<rect class="out" x="{x:.1f}" y="76" width="{lw:.1f}" height="8" fill="{color}" style="animation-delay: .4s"/>')
-        x += lw
-    if not langs:
-        body.append(text(x0, 112, [("No coding activity recorded yet.", t["dim"], False)]))
-        H = 130
-    else:
-        col = bw / 2
-        for j, (l, color) in enumerate(zip(langs, t["langs"])):
-            lx, ly = x0 + (j % 2) * col, 108 + (j // 2) * 20
-            body.append(text(lx, ly, [("■ ", color, False), (clip(l["name"], 12) + " ", t["dim"], False),
-                                      (short_time(l["text"]), t["dim"], False)], delay=.5 + j * .05, size=13))
-        H = 108 + ((len(langs) + 1) // 2 - 1) * 20 + 22
-    return window(t, H, "wakatime", "\n  ".join(body), w=w)
-
-
-# ================================================================ 5. Spotify (작은 창 420px)
-EQ_STYLE = '''<style>
-    .eq { transform-box: fill-box; transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
-    @keyframes eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-    @media (prefers-reduced-motion: reduce) { .eq { animation: none; transform: scaleY(.7); } }
-  </style>'''
-
-
+# ================================================================ 5. Spotify 플레이어 (작은 창 420px)
 def spotify(t, cfg, sp, now):
-    """앨범 커버 + LAST PLAYED · 4h ago + 제목 + 아티스트 + 음악 막대 애니메이션"""
-    w, x0, size = 420, 18, 72
-    tracks = (sp or {}).get("tracks") or []
-    tr = tracks[0] if tracks else None
-    top = 48
-    body = [f'<defs><clipPath id="cv"><rect x="{x0}" y="{top}" width="{size}" height="{size}" rx="6"/></clipPath>'
+    """큰 커버 + ♪ LAST PLAYED + 제목 + 아티스트 + 끝까지 찬 재생 막대(다 들은 곡) + 곡 길이 + 몇 시간 전"""
+    w, x0, top, s = 420, 18, 50, 96
+    tx = x0 + s + 18
+    cells = int((w - tx - x0) / 10.2)        # 17px 제목 기준 칸 수
+    tr = ((sp or {}).get("tracks") or [None])[0]
+    body = [f'<defs><clipPath id="cv"><rect x="{x0}" y="{top}" width="{s}" height="{s}" rx="8"/></clipPath>'
             f'<linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#fc9ccc"/><stop offset=".55" stop-color="#e43c9c"/>'
             f'<stop offset="1" stop-color="#a97be6"/></linearGradient></defs>']
     if tr and tr.get("cover"):
-        body.append(f'<image href="{tr["cover"]}" x="{x0}" y="{top}" width="{size}" height="{size}" '
+        body.append(f'<image href="{tr["cover"]}" x="{x0}" y="{top}" width="{s}" height="{s}" '
                     f'preserveAspectRatio="xMidYMid slice" clip-path="url(#cv)"/>')
     else:
-        body.append(f'<rect x="{x0}" y="{top}" width="{size}" height="{size}" rx="6" fill="url(#cg)"/>')
+        body.append(f'<rect x="{x0}" y="{top}" width="{s}" height="{s}" rx="8" fill="url(#cg)"/>')
+    if not tr:
+        body.append(text(tx, top + 52, [("Nothing played recently.", t["dim"], False)], size=13))
+        return window(t, top + s + 18, "spotify", "\n  ".join(body), w=w)
 
-    tx = x0 + size + 16
-    cells = int((w - tx - x0) / CW)                       # 오른쪽 글자 칸 수
-    if tr:
-        when = ago(tr["played_at"], now) + " ago"
-        body.append(text(tx, top + 14, [("LAST PLAYED", t["pink"], True), (" · " + when, t["dim"], False)], size=12))
-        body.append(text(tx, top + 34, [(clip(tr["title"], cells), t["fg"], True)]))
-        body.append(text(tx, top + 52, [(clip(tr["artist"], cells), t["dim"], False)], size=13))
-        colors = [t["pink"], t["lav"], t["pink"], t["lav"], t["pink"]]
-        for i, c in enumerate(colors):
-            body.append(f'<rect class="eq" x="{tx + i * 7}" y="{top + 58}" width="4" height="14" fill="{c}" '
-                        f'style="animation-delay: {-(i * .23) % 1:.2f}s"/>')
-    else:
-        body.append(text(tx, top + 30, [("Nothing played recently.", t["dim"], False)]))
-    H = top + size + 16
-    return window(t, H, "spotify", "\n  ".join(body), w=w, extra=EQ_STYLE)
+    bar = w - tx - x0
+    body += [text(tx, top + 12, [("♪ LAST PLAYED", t["pink"], True)], size=12),
+             text(tx, top + 36, [(clip(tr["title"], cells), t["fg"], True)], size=17),
+             text(tx, top + 56, [(clip(tr["artist"], int(bar / 7.8)), t["dim"], False)], size=13),
+             f'<rect x="{tx}" y="{top + 72}" width="{bar}" height="4" rx="2" fill="{t["pink"]}"/>',
+             f'<circle cx="{tx + bar}" cy="{top + 74}" r="5" fill="{t["fg"]}"/>',
+             text(tx, top + 94, [(tr.get("duration", ""), t["dim"], False)], size=12),
+             text(w - x0, top + 94, [(ago(tr["played_at"], now) + " ago", t["dim"], False)], size=12, anchor="end")]
+    return window(t, top + s + 18, "spotify", "\n  ".join(body), w=w)
+
+
+# ================================================================ 6. 오늘의 개발 명언 (작은 창 495px)
+QUOTES = [  # (명언, 말한 사람) — 날마다 하나씩 돌아가며 나온다
+    ("Talk is cheap. Show me the code.", "Linus Torvalds"),
+    ("Simplicity is prerequisite for reliability.", "Edsger W. Dijkstra"),
+    ("First, solve the problem. Then, write the code.", "John Johnson"),
+    ("Premature optimization is the root of all evil.", "Donald Knuth"),
+    ("Make it work, make it right, make it fast.", "Kent Beck"),
+    ("Programs must be written for people to read, and only incidentally for machines to execute.", "Harold Abelson"),
+    ("Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", "Martin Fowler"),
+    ("The best way to predict the future is to invent it.", "Alan Kay"),
+    ("Program testing can be used to show the presence of bugs, but never to show their absence.", "Edsger W. Dijkstra"),
+    ("Code is like humor. When you have to explain it, it's bad.", "Cory House"),
+    ("Before software can be reusable it first has to be usable.", "Ralph Johnson"),
+    ("Deleted code is debugged code.", "Jeff Sickel"),
+]
+
+
+def wrap(s, cells):
+    """단어 단위로 줄바꿈 (칸 수 기준)."""
+    lines, cur = [], ""
+    for word in s.split():
+        if cur and width(cur + " " + word) > cells:
+            lines.append(cur)
+            cur = word
+        else:
+            cur = (cur + " " + word).strip()
+    return lines + [cur] if cur else lines
+
+
+def fortune(t, now):
+    """❯ fortune dev / 왼쪽 분홍 막대 + 16px 문장(여러 줄) + 라벤더색 말한 사람"""
+    w, x0, fs, lh = 495, 18, 16, 24
+    q, who = QUOTES[now.toordinal() % len(QUOTES)]
+    tx = x0 + 16                                   # 막대 오른쪽 글자 시작
+    lines = wrap(q, int((w - tx - x0) / (fs * .6)))
+    top = 94
+    body = [text(x0, 60, [("❯ ", t["pink"], True), ("fortune dev", t["fg"], False)])]
+    for i, line in enumerate(lines):
+        body.append(text(tx, top + i * lh, [(line, t["fg"], True)], size=fs, delay=.2))
+    y = top + (len(lines) - 1) * lh + 26
+    body.append(text(tx, y, [("— " + who, t["lav"], False)], size=13, delay=.35))
+    body.append(f'<rect class="out" x="{x0}" y="{top - 16}" width="3" height="{y - top + 20}" rx="1.5" '
+                f'fill="{t["pink"]}" style="animation-delay: .2s"/>')
+    return window(t, y + 22, "fortune", "\n  ".join(body), w=w)
 
 
 # ================================================================ 6. 마무리
@@ -400,14 +421,14 @@ def load(name):
 
 def main():
     cfg = yaml.safe_load((ROOT / "profile.yml").read_text(encoding="utf-8"))
-    gh, waka, sp = load("github.json"), load("wakatime.json"), load("spotify.json")
+    gh, sp = load("github.json"), load("spotify.json")
     now = dt.datetime.now(KST)
     art = cells(DATA / "avatar.png", ART_COLS, ART_ROWS)
     OUT.mkdir(exist_ok=True)
 
     for mode, t in THEMES.items():
         files = {"hero": hero(t, cfg, gh, art, now), "btop": btop(t, cfg, gh, now),
-                 "wakatime": wakatime(t, cfg, waka, now), "spotify": spotify(t, cfg, sp, now),
+                 "gitlog": gitlog(t, cfg, gh, now), "spotify": spotify(t, cfg, sp, now), "fortune": fortune(t, now),
                  "footer": footer(t, cfg, now)}
         for i, s in enumerate(cfg["sections"], 1):
             files[f"h{i:02d}"] = heading(t, f"{i:02d}", s["title"], s["path"])

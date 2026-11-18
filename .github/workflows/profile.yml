@@ -35,29 +35,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Fetch data (GitHub · WakaTime · Spotify)
+      - name: Fetch data (GitHub · Spotify)
         run: python scripts/fetch.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WAKATIME_TOKEN: ${{ secrets.WAKATIME_TOKEN }}
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
           SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
 
       - name: Render terminal SVGs
         run: python scripts/render.py
-
-      - name: Generate Pac-Man contribution graph
-        uses: abozanona/pacman-contribution-graph@70945878b1118303b37b88060fc7145e1a57d7b1  # main, 2026-11-19 고정
-        with:
-          github_user_name: ${{ github.repository_owner }}
-          games: pacman
-
-      - name: Copy Pac-Man SVGs into assets/
-        run: |
-          ls dist
-          cp dist/pacman-contribution-graph.svg      assets/pacman-light.svg
-          cp dist/pacman-contribution-graph-dark.svg assets/pacman-dark.svg
 
       - name: Commit changed assets
         run: |
