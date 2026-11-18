@@ -19,6 +19,7 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
@@ -167,10 +168,22 @@ def fetch_spotify(client_id, client_secret, refresh_token, count):
 
 
 # ---------------------------------------------------------------- main
+def optional(name, fn, *args):
+    """WakaTime·Spotify 는 실패해도 전체를 멈추지 않는다. 경고만 남기고 해당 카드는 '기록 없음'으로 그린다."""
+    try:
+        fn(*args)
+    except urllib.error.HTTPError as e:
+        hint = {401: "키가 틀렸거나 만료됐어요", 403: "키 값이 정확한지 확인하세요 (앞뒤 공백, 'api_key =' 같은 앞부분 포함 여부)"}
+        body = e.read()[:300].decode("utf-8", "replace").replace("\n", " ")  # 서버가 알려 주는 이유 (키는 들어 있지 않음)
+        print(f"::warning::{name} 요청 실패 HTTP {e.code} — {hint.get(e.code, '잠시 뒤 다시 시도됩니다')} | 응답: {body}")
+    except Exception as e:  # 네트워크 오류 등
+        print(f"::warning::{name} 요청 실패 — {type(e).__name__}: {e}")
+
+
 def main():
     cfg = yaml.safe_load((ROOT / "profile.yml").read_text(encoding="utf-8"))
     DATA.mkdir(exist_ok=True)
-    env = os.environ.get
+    env = lambda k: (os.environ.get(k) or "").strip()  # Secrets 값 앞뒤 공백·줄바꿈 제거
 
     token = env("GITHUB_TOKEN")
     if not token:
@@ -180,14 +193,14 @@ def main():
 
     print("WakaTime")
     if env("WAKATIME_API_KEY"):
-        fetch_wakatime(env("WAKATIME_API_KEY"))
+        optional("WakaTime", fetch_wakatime, env("WAKATIME_API_KEY"))
     else:
         print("  WAKATIME_API_KEY 없음 → 건너뜀")
 
     print("Spotify")
     spotify = [env("SPOTIFY_CLIENT_ID"), env("SPOTIFY_CLIENT_SECRET"), env("SPOTIFY_REFRESH_TOKEN")]
     if all(spotify):
-        fetch_spotify(*spotify, cfg.get("spotify_count", 5))
+        optional("Spotify", fetch_spotify, *spotify, cfg.get("spotify_count", 5))
     else:
         print("  SPOTIFY_* 없음 → 건너뜀")
 
