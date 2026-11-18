@@ -43,8 +43,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=java,spring,elasticsearch,mysql,redis,docker,aws,astro,git,idea&theme=dark&perline=10">
-    <img src="https://skillicons.dev/icons?i=java,spring,elasticsearch,mysql,redis,docker,aws,astro,git,idea&theme=light&perline=10" alt="Java, Spring, Elasticsearch, MySQL, Redis, Docker, AWS, Astro, Git, IntelliJ IDEA">
+    <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=java%2Cspring%2Celasticsearch%2Cmysql%2Credis%2Cdocker%2Caws%2Castro%2Cgit%2Cidea&theme=dark&perline=10">
+    <img src="https://skillicons.dev/icons?i=java%2Cspring%2Celasticsearch%2Cmysql%2Credis%2Cdocker%2Caws%2Castro%2Cgit%2Cidea&theme=light&perline=10" alt="Java, Spring, Elasticsearch, MySQL, Redis, Docker, AWS, Astro, Git, IntelliJ IDEA">
   </picture>
 </p>
 

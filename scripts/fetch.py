@@ -111,8 +111,10 @@ def fetch_github(login, token, exclude):
     # 작성한 공개 커밋 수 (검색 API)
     commits = gh(f"/search/commits?q=author:{login}&per_page=1")["total_count"]
 
-    # 내 공개 저장소 (포크 제외): 언어 바이트 합계 + 최근 푸시 순 목록
-    repos = [r for r in gh(f"/users/{login}/repos?per_page=100&sort=pushed") if not r["fork"]]
+    # 내 공개 저장소 (포크·프로필 저장소 자신 제외): 언어 바이트 합계 + 최근 푸시 순 목록
+    # 프로필 저장소(아이디와 같은 이름)는 이 스크립트들 때문에 Python 비율이 생기고 매일 '방금 푸시'로 잡혀서 뺀다
+    repos = [r for r in gh(f"/users/{login}/repos?per_page=100&sort=pushed")
+             if not r["fork"] and r["name"].lower() != login.lower()]
     langs = Counter()
     for r in repos:
         langs.update(gh(f"/repos/{login}/{r['name']}/languages"))
