@@ -34,8 +34,5 @@ sections:
 btop_exclude:
   - github-action-test
 
-# Spotify: 최근 들은 곡 몇 개를 보여 줄지
-spotify_count: 5
-
 # 맨 아래 마무리 창 문구
 footer: Thanks for visiting. See you around!

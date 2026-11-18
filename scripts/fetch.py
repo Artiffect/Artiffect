@@ -3,7 +3,7 @@
     data/avatar.png     프로필 사진
     data/github.json    잔디·통계·언어 비율·최근 저장소
     data/wakatime.json  지난 7일 언어별 코딩 시간   (WAKATIME_TOKEN 이 있을 때만)
-    data/spotify.json   최근 들은 곡               (SPOTIFY_* 세 개가 있을 때만)
+    data/spotify.json   가장 최근 들은 곡 + 앨범 커버  (SPOTIFY_* 세 개가 있을 때만)
 
 환경 변수
     GITHUB_TOKEN            필수. Actions에선 자동으로 들어오고, 로컬에선 `gh auth token` 값.
@@ -155,16 +155,32 @@ def fetch_wakatime(token):
 
 
 # ---------------------------------------------------------------- Spotify
-def fetch_spotify(client_id, client_secret, refresh_token, count):
+def cover_data_uri(url, px=144):
+    """앨범 커버를 작게 줄여 SVG 안에 넣을 data URI 로. (README 의 SVG 는 외부 이미지를 불러오지 못한다)"""
+    from io import BytesIO
+    from PIL import Image
+    img = Image.open(BytesIO(request(url))).convert("RGB").resize((px, px), Image.LANCZOS)
+    buf = BytesIO()
+    img.save(buf, "JPEG", quality=82)
+    return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
+def fetch_spotify(client_id, client_secret, refresh_token):
+    """가장 최근에 들은 곡 1개 + 앨범 커버."""
     auth = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
     access = request("https://accounts.spotify.com/api/token", auth=auth,
                      data={"grant_type": "refresh_token", "refresh_token": refresh_token})["access_token"]
-    res = request(f"https://api.spotify.com/v1/me/player/recently-played?limit={count}", token=access)
-    write_json("spotify.json", {
-        "tracks": [{"title": i["track"]["name"],
-                    "artist": ", ".join(a["name"] for a in i["track"]["artists"]),
-                    "played_at": i["played_at"]} for i in res.get("items", [])],
-    })
+    items = request("https://api.spotify.com/v1/me/player/recently-played?limit=1", token=access).get("items", [])
+    tracks = []
+    for i in items:
+        tr = i["track"]
+        images = sorted(tr["album"].get("images", []), key=lambda im: im.get("width") or 0)
+        pick = next((im for im in images if (im.get("width") or 0) >= 144), images[-1] if images else None)
+        tracks.append({"title": tr["name"],
+                       "artist": ", ".join(a["name"] for a in tr["artists"]),
+                       "played_at": i["played_at"],
+                       "cover": cover_data_uri(pick["url"]) if pick else None})
+    write_json("spotify.json", {"tracks": tracks})
 
 
 # ---------------------------------------------------------------- main
@@ -200,7 +216,7 @@ def main():
     print("Spotify")
     spotify = [env("SPOTIFY_CLIENT_ID"), env("SPOTIFY_CLIENT_SECRET"), env("SPOTIFY_REFRESH_TOKEN")]
     if all(spotify):
-        optional("Spotify", fetch_spotify, *spotify, cfg.get("spotify_count", 5))
+        optional("Spotify", fetch_spotify, *spotify)
     else:
         print("  SPOTIFY_* 없음 → 건너뜀")
 

@@ -81,10 +81,12 @@
   <img src="assets/h04-light.svg" width="100%" alt="04 wakatime">
 </picture>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/wakatime-dark.svg">
-  <img src="assets/wakatime-light.svg" width="100%" alt="WakaTime — coding time in the last 7 days">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/wakatime-dark.svg">
+    <img src="assets/wakatime-light.svg" width="495" alt="WakaTime — coding time in the last 7 days">
+  </picture>
+</p>
 
 <br><br>
 
@@ -93,10 +95,12 @@
   <img src="assets/h05-light.svg" width="100%" alt="05 spotify">
 </picture>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/spotify-dark.svg">
-  <img src="assets/spotify-light.svg" width="100%" alt="Spotify — recently played">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/spotify-dark.svg">
+    <img src="assets/spotify-light.svg" width="420" alt="Spotify — last played track">
+  </picture>
+</p>
 
 <br><br>
 

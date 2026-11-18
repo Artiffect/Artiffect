@@ -85,13 +85,17 @@ def pad(s, cells):
     return s + " " * (cells - width(s))
 
 
-def text(x, y, parts, delay=None, anchor=None):
-    """parts: [(글자, 색, 굵게?)] 를 한 줄로. delay 가 있으면 그 시각에 나타난다."""
-    cls = "m t out" if delay is not None else "m t"
+def text(x, y, parts, delay=None, anchor=None, size=None):
+    """parts: [(글자, 색, 굵게?)] 를 한 줄로. delay 가 있으면 그 시각에 나타난다.
+    size 를 주면 터미널 기본(14px) 대신 그 크기로 (카드의 작은 글자용)."""
+    cls = "m" if size else "m t"
+    if delay is not None:
+        cls += " out"
     st = f' style="animation-delay: {delay:.2f}s"' if delay is not None else ""
     an = f' text-anchor="{anchor}"' if anchor else ""
+    fs = f' font-size="{size}"' if size else ""
     inner = "".join(f'<tspan fill="{c}"{" font-weight=\"700\"" if b else ""}>{esc(s)}</tspan>' for s, c, b in parts)
-    return f'<text class="{cls}" x="{x:.1f}" y="{y}" xml:space="preserve"{an}{st}>{inner}</text>'
+    return f'<text class="{cls}" x="{x:.1f}" y="{y}" xml:space="preserve"{fs}{an}{st}>{inner}</text>'
 
 
 def typed(t, x, y, s, delay, dur):
@@ -124,17 +128,17 @@ STYLE = f'''<style>
   </style>'''
 
 
-def window(t, H, title, body):
-    """macOS 터미널 창: 제목 표시줄 + 신호등 점 + 본문."""
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
-  {STYLE}
-  <rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="10" fill="{t["bg"]}"/>
-  <path d="M1 32V11A10 10 0 0 1 11 1H{W - 11}A10 10 0 0 1 {W - 1} 11V32Z" fill="{t["bar"]}"/>
-  <line x1="1" y1="32.5" x2="{W - 1}" y2="32.5" stroke="{t["barline"]}"/>
+def window(t, H, title, body, w=W, extra=""):
+    """macOS 터미널 창: 제목 표시줄 + 신호등 점 + 본문. w 로 작은 창(카드)도 만든다."""
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{H}" viewBox="0 0 {w} {H}">
+  {STYLE}{extra}
+  <rect x="1" y="1" width="{w - 2}" height="{H - 2}" rx="10" fill="{t["bg"]}"/>
+  <path d="M1 32V11A10 10 0 0 1 11 1H{w - 11}A10 10 0 0 1 {w - 1} 11V32Z" fill="{t["bar"]}"/>
+  <line x1="1" y1="32.5" x2="{w - 1}" y2="32.5" stroke="{t["barline"]}"/>
   <circle cx="20" cy="17" r="6" fill="#ff5f57"/><circle cx="40" cy="17" r="6" fill="#febc2e"/><circle cx="60" cy="17" r="6" fill="#28c840"/>
-  <text x="{W / 2:.0f}" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="{t["title"]}">{esc(title)}</text>
+  <text x="{w / 2:.0f}" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="{t["title"]}">{esc(title)}</text>
   {body}
-  <rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="10" fill="none" stroke="{t["line"]}"/>
+  <rect x="1" y="1" width="{w - 2}" height="{H - 2}" rx="10" fill="none" stroke="{t["line"]}"/>
 </svg>'''
 
 
@@ -304,45 +308,78 @@ def heading(t, num, title, path):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="34" viewBox="0 0 {W} 34">{STYLE}{svg}</svg>'
 
 
-# ================================================================ 4. WakaTime
+# ================================================================ 4. WakaTime (작은 창 495px)
+def short_time(s):
+    """'12 hrs 30 mins' → '12h 30m'"""
+    for a, b in ((" hrs", "h"), (" hr", "h"), (" mins", "m"), (" min", "m"), (" secs", "s"), (" sec", "s")):
+        s = s.replace(a, b)
+    return s
+
+
 def wakatime(t, cfg, waka, now):
-    p, cx = prompt(t, cfg, 60, now)
-    body = [p, typed(t, cx, 60, "wakatime --last-7-days", .3, .9)]
-    langs = (waka or {}).get("languages") or []
+    """❯ wakatime --last-7-days / 한 줄짜리 색 막대 / 2열 범례 (■ Java 12h 30m)"""
+    w, x0 = 495, 18
+    bw = w - 2 * x0
+    langs = ((waka or {}).get("languages") or [])[:4]
+    body = [text(x0, 60, [("❯ ", t["pink"], True), ("wakatime --last-7-days", t["fg"], False)])]
+    # 막대: 언어 비율대로 이어 붙인 한 줄 (데이터가 없으면 빈 트랙만)
+    body.append(f'<rect x="{x0}" y="76" width="{bw}" height="8" rx="2" fill="{t["track"]}"/>')
+    x, total = x0, sum(l["percent"] for l in langs) or 100
+    for l, color in zip(langs, t["langs"]):
+        lw = bw * l["percent"] / 100
+        body.append(f'<rect class="out" x="{x:.1f}" y="76" width="{lw:.1f}" height="8" fill="{color}" style="animation-delay: .4s"/>')
+        x += lw
     if not langs:
-        body.append(text(20, 92, [("No coding activity recorded yet.", t["dim"], False)], delay=1.3))
-        H = 116
+        body.append(text(x0, 112, [("No coding activity recorded yet.", t["dim"], False)]))
+        H = 130
     else:
-        body.append(text(20, 92, [("total  ", t["dim"], False), (waka["total"], t["fg"], True)], delay=1.3))
+        col = bw / 2
         for j, (l, color) in enumerate(zip(langs, t["langs"])):
-            full = max(1, round(l["percent"] / 100 * 40))
-            body.append(text(20, 122 + j * 22, [(pad(l["name"], 13), t["fg"], False), ("■" * full, color, False),
-                                                ("■" * (40 - full), t["track"], False),
-                                                (f"{l['percent']:>6.1f}%  ", t["dim"], False), (l["text"], t["fg"], False)],
-                             delay=1.4 + j * .06))
-        H = 122 + len(langs) * 22 + 6
-    return window(t, H, "wakatime", "\n  ".join(body))
+            lx, ly = x0 + (j % 2) * col, 108 + (j // 2) * 20
+            body.append(text(lx, ly, [("■ ", color, False), (clip(l["name"], 12) + " ", t["dim"], False),
+                                      (short_time(l["text"]), t["dim"], False)], delay=.5 + j * .05, size=13))
+        H = 108 + ((len(langs) + 1) // 2 - 1) * 20 + 22
+    return window(t, H, "wakatime", "\n  ".join(body), w=w)
 
 
-# ================================================================ 5. Spotify
+# ================================================================ 5. Spotify (작은 창 420px)
+EQ_STYLE = '''<style>
+    .eq { transform-box: fill-box; transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
+    @keyframes eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+    @media (prefers-reduced-motion: reduce) { .eq { animation: none; transform: scaleY(.7); } }
+  </style>'''
+
+
 def spotify(t, cfg, sp, now):
-    n = cfg.get("spotify_count", 5)
-    p, cx = prompt(t, cfg, 60, now)
-    body = [p, typed(t, cx, 60, f"spotify recent --limit {n}", .3, .9)]
+    """앨범 커버 + LAST PLAYED · 4h ago + 제목 + 아티스트 + 음악 막대 애니메이션"""
+    w, x0, size = 420, 18, 72
     tracks = (sp or {}).get("tracks") or []
-    if not tracks:
-        body.append(text(20, 92, [("Nothing played recently.", t["dim"], False)], delay=1.3))
-        H = 116
+    tr = tracks[0] if tracks else None
+    top = 48
+    body = [f'<defs><clipPath id="cv"><rect x="{x0}" y="{top}" width="{size}" height="{size}" rx="6"/></clipPath>'
+            f'<linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#fc9ccc"/><stop offset=".55" stop-color="#e43c9c"/>'
+            f'<stop offset="1" stop-color="#a97be6"/></linearGradient></defs>']
+    if tr and tr.get("cover"):
+        body.append(f'<image href="{tr["cover"]}" x="{x0}" y="{top}" width="{size}" height="{size}" '
+                    f'preserveAspectRatio="xMidYMid slice" clip-path="url(#cv)"/>')
     else:
-        for j, tr in enumerate(tracks[:n]):
-            # 오른쪽 '12m ago' 와 겹치지 않게 칸 수로 자른다 (제목 44칸 + 아티스트 30칸)
-            title, artist = clip(tr["title"], 44), clip(tr["artist"], 30)
-            y = 94 + j * 22
-            body.append(text(20, y, [("♪ " if j == 0 else "  ", t["pink"], True), (f"{title}", t["fg"], j == 0),
-                                     ("  ", t["fg"], False), (artist, t["lav"], False)], delay=1.3 + j * .06))
-            body.append(text(W - 20, y, [(ago(tr["played_at"], now) + " ago", t["dim"], False)], delay=1.3 + j * .06, anchor="end"))
-        H = 94 + len(tracks[:n]) * 22 + 6
-    return window(t, H, "spotify", "\n  ".join(body))
+        body.append(f'<rect x="{x0}" y="{top}" width="{size}" height="{size}" rx="6" fill="url(#cg)"/>')
+
+    tx = x0 + size + 16
+    cells = int((w - tx - x0) / CW)                       # 오른쪽 글자 칸 수
+    if tr:
+        when = ago(tr["played_at"], now) + " ago"
+        body.append(text(tx, top + 14, [("LAST PLAYED", t["pink"], True), (" · " + when, t["dim"], False)], size=12))
+        body.append(text(tx, top + 34, [(clip(tr["title"], cells), t["fg"], True)]))
+        body.append(text(tx, top + 52, [(clip(tr["artist"], cells), t["dim"], False)], size=13))
+        colors = [t["pink"], t["lav"], t["pink"], t["lav"], t["pink"]]
+        for i, c in enumerate(colors):
+            body.append(f'<rect class="eq" x="{tx + i * 7}" y="{top + 58}" width="4" height="14" fill="{c}" '
+                        f'style="animation-delay: {-(i * .23) % 1:.2f}s"/>')
+    else:
+        body.append(text(tx, top + 30, [("Nothing played recently.", t["dim"], False)]))
+    H = top + size + 16
+    return window(t, H, "spotify", "\n  ".join(body), w=w, extra=EQ_STYLE)
 
 
 # ================================================================ 6. 마무리
