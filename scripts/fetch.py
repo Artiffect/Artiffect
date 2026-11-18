@@ -2,12 +2,13 @@
 
     data/avatar.png     프로필 사진
     data/github.json    잔디·통계·언어 비율·최근 저장소
-    data/wakatime.json  지난 7일 언어별 코딩 시간   (WAKATIME_API_KEY 가 있을 때만)
+    data/wakatime.json  지난 7일 언어별 코딩 시간   (WAKATIME_TOKEN 이 있을 때만)
     data/spotify.json   최근 들은 곡               (SPOTIFY_* 세 개가 있을 때만)
 
 환경 변수
     GITHUB_TOKEN            필수. Actions에선 자동으로 들어오고, 로컬에선 `gh auth token` 값.
-    WAKATIME_API_KEY        선택. wakatime.com/settings/api-key
+    WAKATIME_TOKEN          선택. wakatime.com/oauth 에서 받은 개인 OAuth 토큰 (waka_tok_…, read_stats 권한)
+                            ※ API 키(waka_…)는 플러그인 전용이라 통계를 읽을 수 없어요.
     SPOTIFY_CLIENT_ID       선택. Spotify 개발자 앱
     SPOTIFY_CLIENT_SECRET   선택.
     SPOTIFY_REFRESH_TOKEN   선택. user-read-recently-played 권한으로 받은 refresh token
@@ -144,9 +145,8 @@ def fetch_github(login, token, exclude):
 
 
 # ---------------------------------------------------------------- WakaTime
-def fetch_wakatime(key):
-    auth = base64.b64encode(key.encode()).decode()
-    res = request("https://wakatime.com/api/v1/users/current/stats/last_7_days", auth=auth)["data"]
+def fetch_wakatime(token):
+    res = request("https://wakatime.com/api/v1/users/current/stats/last_7_days", token=token)["data"]
     write_json("wakatime.json", {
         "total": res.get("human_readable_total", ""),
         "languages": [{"name": l["name"], "text": l["text"], "percent": l["percent"]}
@@ -173,7 +173,7 @@ def optional(name, fn, *args):
     try:
         fn(*args)
     except urllib.error.HTTPError as e:
-        hint = {401: "키가 틀렸거나 만료됐어요", 403: "키 값이 정확한지 확인하세요 (앞뒤 공백, 'api_key =' 같은 앞부분 포함 여부)"}
+        hint = {401: "키가 틀렸거나 만료됐어요", 403: "권한이 없어요. WakaTime은 개인 OAuth 토큰(read_stats)이 필요해요"}
         body = e.read()[:300].decode("utf-8", "replace").replace("\n", " ")  # 서버가 알려 주는 이유 (키는 들어 있지 않음)
         print(f"::warning::{name} 요청 실패 HTTP {e.code} — {hint.get(e.code, '잠시 뒤 다시 시도됩니다')} | 응답: {body}")
     except Exception as e:  # 네트워크 오류 등
@@ -192,10 +192,10 @@ def main():
     fetch_github(cfg["github"], token, set(cfg.get("btop_exclude", [])))
 
     print("WakaTime")
-    if env("WAKATIME_API_KEY"):
-        optional("WakaTime", fetch_wakatime, env("WAKATIME_API_KEY"))
+    if env("WAKATIME_TOKEN"):
+        optional("WakaTime", fetch_wakatime, env("WAKATIME_TOKEN"))
     else:
-        print("  WAKATIME_API_KEY 없음 → 건너뜀")
+        print("  WAKATIME_TOKEN 없음 → 건너뜀")
 
     print("Spotify")
     spotify = [env("SPOTIFY_CLIENT_ID"), env("SPOTIFY_CLIENT_SECRET"), env("SPOTIFY_REFRESH_TOKEN")]
