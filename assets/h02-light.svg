@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="34" viewBox="0 0 900 34"><style>
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; white-space: pre; }
+    .t { font-size: 14px; }
+    .out { opacity: 0; animation: show .01s linear forwards; }
+    .cursor { animation: blink 1.1s steps(1) infinite; }
+    @keyframes show { to { opacity: 1; } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .out, .cover, .cursor { animation: none !important; }
+      .out { opacity: 1; }
+      .cover { display: none; }
+    }
+  </style><rect x="0.0" y="7" width="34.6" height="21" fill="#f08ac0"/><text class="m t" x="0.0" y="22" xml:space="preserve"><tspan fill="#1f1f1f" font-weight="700"> 02 </tspan></text><rect x="33.6" y="7" width="127.0" height="21" fill="#e3e3e3"/><text class="m t" x="33.6" y="22" xml:space="preserve"><tspan fill="#1f1f1f" font-weight="700">  github stats </tspan></text><polygon points="33.6,7 43.6,17.5 33.6,28" fill="#f08ac0"/><polygon points="159.6,7 169.6,17.5 159.6,28" fill="#e3e3e3"/><line x1="182" y1="17.5" x2="829" y2="17.5" stroke="#d0d0d0"/><text class="m t" x="900.0" y="22" xml:space="preserve" text-anchor="end"><tspan fill="#8a8a8a">~/stats</tspan></text></svg>

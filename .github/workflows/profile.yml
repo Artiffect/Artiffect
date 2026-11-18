@@ -1,0 +1,72 @@
+name: profile
+
+# 매일 한 번 데이터를 받아 assets/*.svg 를 다시 그리고 커밋한다.
+on:
+  schedule:
+    - cron: "0 15 * * *"        # 매일 00:00 (한국 시간)
+  workflow_dispatch:             # Actions 탭에서 직접 실행
+  push:
+    branches: [main]
+    paths:                       # 문구·스크립트를 고치면 바로 다시 그린다
+      - profile.yml
+      - scripts/**
+      - requirements.txt
+      - .github/workflows/profile.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch data (GitHub · WakaTime · Spotify)
+        run: python scripts/fetch.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+
+      - name: Render terminal SVGs
+        run: python scripts/render.py
+
+      - name: Generate Pac-Man contribution graph
+        uses: abozanona/pacman-contribution-graph@main
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          games: pacman
+
+      - name: Copy Pac-Man SVGs into assets/
+        run: |
+          ls dist
+          cp dist/pacman-contribution-graph.svg      assets/pacman-light.svg
+          cp dist/pacman-contribution-graph-dark.svg assets/pacman-dark.svg
+
+      - name: Commit changed assets
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets
+          if git diff --cached --quiet; then
+            echo "변경 없음"
+          else
+            git commit -m "chore: 프로필 이미지 갱신"
+            git push
+          fi

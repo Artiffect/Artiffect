@@ -1,0 +1,41 @@
+# 프로필 README에 들어가는 글자 설정.
+# 이 파일만 고쳐서 커밋하면 GitHub Actions가 SVG를 다시 그려요.
+# {중괄호} 값은 GitHub 데이터로 자동 채워져요: {uptime} {commits} {repos} {followers} {contribs}
+
+github: Artiffect          # GitHub 아이디 (데이터를 가져올 계정)
+
+# 상단 터미널: 파워라인 프롬프트 칸
+prompt:
+  user: artiffect
+  path: ~/github
+  branch: main
+
+# 상단 터미널: neofetch 오른쪽 정보 (위에서부터 순서대로, 줄 추가·삭제 가능)
+neofetch:
+  Role: Backend Developer
+  Uptime: "{uptime} on GitHub"
+  Commits: "{commits}"
+  Repos: "{repos}"
+  Stack: Java, Spring Boot, WebFlux, JPA
+  Also: Elasticsearch, Astro
+  Blog: artiffect.github.io
+  Motto: Always learning, always shipping.
+
+# 섹션 제목 (번호 01, 02 ... 는 순서대로 자동으로 붙어요)
+sections:
+  - { title: tech stack,   path: ~/stack }
+  - { title: github stats, path: ~/stats }
+  - { title: activity,     path: ~/activity }
+  - { title: wakatime,     path: ~/wakatime }
+  - { title: spotify,      path: ~/spotify }
+  - { title: pac-man,      path: ~/pacman }
+
+# btop 프로세스 목록에서 뺄 저장소
+btop_exclude:
+  - github-action-test
+
+# Spotify: 최근 들은 곡 몇 개를 보여 줄지
+spotify_count: 5
+
+# 맨 아래 마무리 창 문구
+footer: Thanks for visiting. See you around!
