@@ -20,15 +20,15 @@
   <text x="450" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#6a6a6a">git</text>
   <text class="m t" x="18.0" y="60" xml:space="preserve"><tspan fill="#c8458a" font-weight="700">❯ </tspan><tspan fill="#1f1f1f">git log --oneline -5</tspan></text>
   <text class="m out" x="18.0" y="88" xml:space="preserve" font-size="13" style="animation-delay: 0.20s"><tspan fill="#7b5fb5">599fe47  </tspan><tspan fill="#1f1f1f">chore: GitHub 아이디 변경 반영</tspan></text>
-  <text class="m out" x="882.0" y="88" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.20s"><tspan fill="#8a8a8a">artiffect.github.io · 18h</tspan></text>
+  <text class="m out" x="882.0" y="88" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.20s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
   <text class="m out" x="18.0" y="108" xml:space="preserve" font-size="13" style="animation-delay: 0.25s"><tspan fill="#7b5fb5">511afdb  </tspan><tspan fill="#1f1f1f">[Search] 인플루언서 검색 회원별 호출 한도 (분당 60회) (#1012) (#1014)</tspan></text>
-  <text class="m out" x="882.0" y="108" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.25s"><tspan fill="#8a8a8a">beadv8_8_LMS_BE · 18h</tspan></text>
+  <text class="m out" x="882.0" y="108" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.25s"><tspan fill="#8a8a8a">beadv8_8_LMS_BE · 1d</tspan></text>
   <text class="m out" x="18.0" y="128" xml:space="preserve" font-size="13" style="animation-delay: 0.30s"><tspan fill="#7b5fb5">71d8b44  </tspan><tspan fill="#1f1f1f">feat: 프로젝트 페이지 추가</tspan></text>
-  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#8a8a8a">artiffect.github.io · 18h</tspan></text>
+  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
   <text class="m out" x="18.0" y="148" xml:space="preserve" font-size="13" style="animation-delay: 0.35s"><tspan fill="#7b5fb5">9d9e99b  </tspan><tspan fill="#1f1f1f">fix: 디자인 리뷰 반영 및 DESIGN.md 추가</tspan></text>
-  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#8a8a8a">artiffect.github.io · 20h</tspan></text>
+  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
   <text class="m out" x="18.0" y="168" xml:space="preserve" font-size="13" style="animation-delay: 0.40s"><tspan fill="#7b5fb5">6a448ce  </tspan><tspan fill="#1f1f1f">feat: OG 이미지 새 디자인 적용 및 README 갱신</tspan></text>
-  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#8a8a8a">artiffect.github.io · 20h</tspan></text>
+  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
   <rect x="1" y="1" width="898" height="188" rx="10" fill="none" stroke="#d0d0d0"/>
   </g>
 </svg>

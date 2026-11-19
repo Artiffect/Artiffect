@@ -26,7 +26,7 @@
   <rect x="132" y="122" width="270" height="4" rx="2" fill="#c8458a"/>
   <circle cx="402" cy="124" r="5" fill="#1f1f1f"/>
   <text class="m" x="132.0" y="144" xml:space="preserve" font-size="12"><tspan fill="#8a8a8a">4:45</tspan></text>
-  <text class="m" x="402.0" y="144" xml:space="preserve" font-size="12" text-anchor="end"><tspan fill="#8a8a8a">1h ago</tspan></text>
+  <text class="m" x="402.0" y="144" xml:space="preserve" font-size="12" text-anchor="end"><tspan fill="#8a8a8a">22h ago</tspan></text>
   <rect x="1" y="1" width="418" height="162" rx="10" fill="none" stroke="#d0d0d0"/>
   </g>
 </svg>
