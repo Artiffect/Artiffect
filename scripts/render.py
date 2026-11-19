@@ -3,6 +3,7 @@
     assets/hero-{dark,light}.svg      상단 터미널 (Last login + 파워라인 프롬프트 + neofetch + 프사 ASCII)
     assets/btop-{dark,light}.svg      btop (잔디 그래프 · 언어 비율 · 최근 저장소)
     assets/h01-{dark,light}.svg ...   섹션 제목 (파워라인 칸)
+    assets/stack-{dark,light}.svg     기술 스택 (카테고리별 아이콘 줄)
     assets/gitlog-{dark,light}.svg    최근 공개 커밋 (git log)
     assets/spotify-{dark,light}.svg   마지막으로 들은 곡 (플레이어)
     assets/fortune-{dark,light}.svg   오늘의 개발 명언
@@ -309,6 +310,33 @@ def heading(t, num, title, path):
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="34" viewBox="0 0 {W} 34">{STYLE}{svg}</svg>'
 
 
+# ================================================================ 3-1. 기술 스택 (아이콘 줄, 너비 가득)
+def stack(t, cfg, mode):
+    """❯ ls ~/stack/*  →  languages/  [아이콘]  Java  Kotlin …"""
+    import base64
+    import re
+    cats = cfg.get("stack") or {}
+    colors = [t["pink"], t["lav"]]
+    body = [text(18, 60, [("❯ ", t["pink"], True), ("ls ~/stack/*", t["fg"], False)])]
+    y, ix, h = 82, 150, 36
+    for i, (cat, items) in enumerate(cats.items()):
+        body.append(text(18, y + 23, [(cat + "/", colors[i % 2], True)], delay=.2 + i * .05))
+        nx = ix
+        icon = DATA / "icons" / f"{cat}-{mode}.svg"
+        if icon.exists():
+            svg = icon.read_text(encoding="utf-8")
+            m = re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg)
+            iw = float(m.group(1)) / float(m.group(2)) * h if m else h
+            uri = "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode()
+            body.append(f'<image class="out" href="{uri}" x="{ix}" y="{y}" width="{iw:.1f}" height="{h}" '
+                        f'style="animation-delay: {.2 + i * .05:.2f}s"/>')
+            nx = ix + iw + 16
+        names = clip("  ".join(items), int((W - 18 - nx) / 7.8))
+        body.append(text(nx, y + 23, [(names, t["dim"], False)], size=13, delay=.2 + i * .05))
+        y += 46
+    return window(t, y + 10, "stack", "\n  ".join(body))
+
+
 # ================================================================ 4. git log (너비 가득)
 def gitlog(t, cfg, gh, now):
     """❯ git log --oneline -5 : 최근 공개 커밋 (프로필 저장소 제외)"""
@@ -427,7 +455,7 @@ def main():
     OUT.mkdir(exist_ok=True)
 
     for mode, t in THEMES.items():
-        files = {"hero": hero(t, cfg, gh, art, now), "btop": btop(t, cfg, gh, now),
+        files = {"hero": hero(t, cfg, gh, art, now), "btop": btop(t, cfg, gh, now), "stack": stack(t, cfg, mode),
                  "gitlog": gitlog(t, cfg, gh, now), "spotify": spotify(t, cfg, sp, now), "fortune": fortune(t, now),
                  "footer": footer(t, cfg, now)}
         for i, s in enumerate(cfg["sections"], 1):

@@ -3,6 +3,7 @@
     data/avatar.png     프로필 사진
     data/github.json    잔디·통계·언어 비율·최근 저장소·최근 커밋
     data/spotify.json   가장 최근 들은 곡 + 앨범 커버  (SPOTIFY_* 세 개가 있을 때만)
+    data/icons/*.svg    기술 스택 카테고리별 아이콘 줄 (skillicons.dev)
 
 환경 변수
     GITHUB_TOKEN            필수. Actions에선 자동으로 들어오고, 로컬에선 `gh auth token` 값.
@@ -148,6 +149,40 @@ def fetch_github(login, token, exclude):
     })
 
 
+# ---------------------------------------------------------------- 기술 스택 아이콘
+# profile.yml 의 이름 → skillicons.dev 아이콘 아이디. 여기 없는 이름은 아이콘 없이 글자만 나온다.
+ICON_IDS = {
+    "java": "java", "kotlin": "kotlin", "typescript": "ts", "javascript": "js", "python": "py", "go": "go",
+    "c": "c", "c++": "cpp", "rust": "rust", "html": "html", "css": "css",
+    "spring": "spring", "spring boot": "spring", "gradle": "gradle", "maven": "maven", "hibernate": "hibernate",
+    "nodejs": "nodejs", "node.js": "nodejs", "express": "express", "nestjs": "nestjs", "django": "django",
+    "flask": "flask", "fastapi": "fastapi", "graphql": "graphql", "react": "react", "vue": "vue",
+    "next.js": "nextjs", "astro": "astro", "tailwind": "tailwind",
+    "mysql": "mysql", "postgresql": "postgres", "mongodb": "mongodb", "redis": "redis",
+    "elasticsearch": "elasticsearch", "kafka": "kafka", "rabbitmq": "rabbitmq", "sqlite": "sqlite",
+    "docker": "docker", "kubernetes": "kubernetes", "aws": "aws", "gcp": "gcp", "azure": "azure",
+    "github actions": "githubactions", "jenkins": "jenkins", "nginx": "nginx", "linux": "linux",
+    "terraform": "terraform", "prometheus": "prometheus", "grafana": "grafana", "git": "git", "github": "github", "intellij idea": "idea", "intellij": "idea",
+    "vscode": "vscode", "postman": "postman", "figma": "figma", "notion": "notion",
+}
+
+
+def fetch_stack_icons(stack):
+    """카테고리마다 아이콘 줄 SVG 를 다크·라이트 두 벌 받아 data/icons/ 에 저장한다."""
+    out = DATA / "icons"
+    out.mkdir(exist_ok=True)
+    for old in out.glob("*.svg"):
+        old.unlink()
+    for cat, items in stack.items():
+        ids = [ICON_IDS[n.lower()] for n in items if n.lower() in ICON_IDS]
+        if not ids:
+            continue
+        for theme in ("dark", "light"):
+            url = f"https://skillicons.dev/icons?i={'%2C'.join(ids)}&theme={theme}"
+            (out / f"{cat}-{theme}.svg").write_bytes(request(url))
+        print(f"  icons: {cat} ({', '.join(ids)})")
+
+
 # ---------------------------------------------------------------- Spotify
 def cover_data_uri(url, px=144):
     """앨범 커버를 작게 줄여 SVG 안에 넣을 data URI 로. (README 의 SVG 는 외부 이미지를 불러오지 못한다)"""
@@ -180,7 +215,7 @@ def fetch_spotify(client_id, client_secret, refresh_token):
 
 # ---------------------------------------------------------------- main
 def optional(name, fn, *args):
-    """Spotify 는 실패해도 전체를 멈추지 않는다. 경고만 남기고 해당 카드는 '기록 없음'으로 그린다."""
+    """Spotify·아이콘은 실패해도 전체를 멈추지 않는다. 경고만 남기고 해당 카드는 '기록 없음'으로 그린다."""
     try:
         fn(*args)
     except urllib.error.HTTPError as e:
@@ -201,6 +236,9 @@ def main():
         sys.exit("GITHUB_TOKEN 이 필요해요. 로컬에선: GITHUB_TOKEN=$(gh auth token) python scripts/fetch.py")
     print("GitHub")
     fetch_github(cfg["github"], token, set(cfg.get("btop_exclude", [])))
+
+    print("Stack icons")
+    optional("Stack icons", fetch_stack_icons, cfg.get("stack") or {})
 
     print("Spotify")
     spotify = [env("SPOTIFY_CLIENT_ID"), env("SPOTIFY_CLIENT_SECRET"), env("SPOTIFY_REFRESH_TOKEN")]

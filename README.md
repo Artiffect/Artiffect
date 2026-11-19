@@ -41,12 +41,10 @@
   <img src="assets/h01-light.svg" width="100%" alt="01 tech stack">
 </picture>
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://skillicons.dev/icons?i=java%2Cspring%2Celasticsearch%2Cmysql%2Credis%2Cdocker%2Caws%2Castro%2Cgit%2Cidea&theme=dark&perline=10">
-    <img src="https://skillicons.dev/icons?i=java%2Cspring%2Celasticsearch%2Cmysql%2Credis%2Cdocker%2Caws%2Castro%2Cgit%2Cidea&theme=light&perline=10" alt="Java, Spring, Elasticsearch, MySQL, Redis, Docker, AWS, Astro, Git, IntelliJ IDEA">
-  </picture>
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/stack-dark.svg">
+  <img src="assets/stack-light.svg" width="100%" alt="tech stack — languages, backend, database, infra, tools">
+</picture>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/h02-dark.svg">

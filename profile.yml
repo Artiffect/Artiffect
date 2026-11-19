@@ -16,10 +16,23 @@ neofetch:
   Uptime: "{uptime} on GitHub"
   Commits: "{commits}"
   Repos: "{repos}"
-  Stack: Java, Spring Boot, WebFlux, JPA
-  Also: Elasticsearch, Astro
+  Lang: Java, Kotlin, TypeScript
+  Backend: Spring Boot, JPA, QueryDSL
+  Data: MySQL, PostgreSQL, Redis, Kafka
+  Infra: Docker, Kubernetes, AWS
   Blog: artiffect.github.io
   Motto: Always learning, always shipping.
+
+# 기술 스택 (01 tech stack). 카테고리 이름과 항목을 자유롭게 바꾸고 추가·삭제할 수 있어요.
+# 이름을 보고 아이콘을 자동으로 붙여요 (예: TypeScript → ts). 아이콘이 없는 기술은 이름만 나와요.
+stack:
+  languages:  [Java, Kotlin, TypeScript, React]
+  backend:    [Spring Boot, Spring Security, JPA, QueryDSL, Gradle]
+  database:   [MySQL, PostgreSQL, Redis, Elasticsearch]
+  messaging:  [Kafka, WebSocket]
+  infra:      [Docker, Kubernetes, AWS, Nginx, GitHub Actions]
+  monitoring: [Prometheus, Grafana]
+  test:       [JUnit5, Mockito, Testcontainers, WireMock, k6]
 
 # 섹션 제목 (번호 01, 02 ... 는 순서대로 자동으로 붙어요)
 sections:
