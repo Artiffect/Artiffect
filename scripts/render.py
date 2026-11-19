@@ -6,7 +6,6 @@
     assets/stack-{dark,light}.svg     기술 스택 (카테고리별 아이콘 줄)
     assets/gitlog-{dark,light}.svg    최근 공개 커밋 (git log)
     assets/spotify-{dark,light}.svg   마지막으로 들은 곡 (플레이어)
-    assets/fortune-{dark,light}.svg   오늘의 개발 명언
     assets/footer-{dark,light}.svg    마무리 (exit)
 
 규칙: 터미널 글자는 전부 같은 고정폭 글꼴 · 14px · 같은 줄 간격. 분홍은 프롬프트와 포인트에만.
@@ -130,10 +129,12 @@ STYLE = f'''<style>
   </style>'''
 
 
-def window(t, H, title, body, w=W, extra=""):
-    """macOS 터미널 창: 제목 표시줄 + 신호등 점 + 본문. w 로 작은 창(카드)도 만든다."""
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{H}" viewBox="0 0 {w} {H}">
+def window(t, H, title, body, w=W, extra="", pad=0, pad_bottom=0):
+    """macOS 터미널 창: 제목 표시줄 + 신호등 점 + 본문. w 로 작은 창(카드)도 만든다.
+    pad: 창 위쪽 빈 여백(px). README 에서 위 요소와 간격을 띄울 때 쓴다."""
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{H + pad + pad_bottom}" viewBox="0 0 {w} {H + pad + pad_bottom}">
   {STYLE}{extra}
+  <g transform="translate(0 {pad})">
   <rect x="1" y="1" width="{w - 2}" height="{H - 2}" rx="10" fill="{t["bg"]}"/>
   <path d="M1 32V11A10 10 0 0 1 11 1H{w - 11}A10 10 0 0 1 {w - 1} 11V32Z" fill="{t["bar"]}"/>
   <line x1="1" y1="32.5" x2="{w - 1}" y2="32.5" stroke="{t["barline"]}"/>
@@ -141,6 +142,7 @@ def window(t, H, title, body, w=W, extra=""):
   <text x="{w / 2:.0f}" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="{t["title"]}">{esc(title)}</text>
   {body}
   <rect x="1" y="1" width="{w - 2}" height="{H - 2}" rx="10" fill="none" stroke="{t["line"]}"/>
+  </g>
 </svg>'''
 
 
@@ -229,7 +231,7 @@ def hero(t, cfg, gh, art, now):
     blocks = "".join(f'<rect x="{330 + i * 26}" y="{yb}" width="26" height="16" fill="{c}"/>' for i, c in enumerate(ANSI))
     body += [f'<g class="out" style="animation-delay: 1.7s">{blocks}</g>',
              f'<g class="out" style="animation-delay: 2s">{p2}</g>', cursor(t, cx2, y_last, 2)]
-    return window(t, H, f"{login} — zsh — 120×32", "\n  ".join(body))
+    return window(t, H, f"{login} — zsh — 120×32", "\n  ".join(body), pad_bottom=TOP_GAP)
 
 
 # ================================================================ 2. btop
@@ -296,18 +298,27 @@ def btop(t, cfg, gh, now):
         body.append(text(472, 298 + j * 20, [(f"{r['id'] % 10000:04d} ", t["dim"], False), (pad(r["name"], 21), t["fg"], j == 0),
                                              (f"{status:<10}", color, False), (f"{'today' if days == 0 else f'{days}d':>7}", t["dim"], False)],
                          delay=1.55 + j * .05))
-    return window(t, H, f"{login} — btop — 120×32", "\n  ".join(body))
+    return window(t, H, f"{login} — btop — 120×32", "\n  ".join(body), pad=TOP_GAP)
 
 
 # ================================================================ 3. 섹션 제목
-def heading(t, num, title, path):
-    """[01]▶[title]▶ ──────────── ~/path"""
-    y = 22
+# 섹션 간격(px). README 에 <br> 을 쓰지 않고 제목 이미지의 위·아래 여백으로 통일한다.
+HEAD_TOP, HEAD_BOTTOM = 40, 24   # 제목 칸 위 / 아래 빈 공간
+GAP = HEAD_TOP                   # 마무리 창 위 여백도 같은 값
+TOP_GAP = 18                     # 상단 터미널 → 배지 → btop 사이 여백
+
+
+def heading(t, num, title, path, top=None, bottom=None):
+    """(위 여백) [01]▶[title]▶ ──────────── ~/path (아래 여백)"""
+    top = HEAD_TOP if top is None else top
+    bottom = HEAD_BOTTOM if bottom is None else bottom
+    y = top + 15                 # 칸(높이 21)이 y-15 ~ y+6 에 그려진다
+    H = top + 21 + bottom
     svg, x = segments(t, 0, y, [(f" {num} ", t["seg1"], t["segfg"]), (f"  {title} ", t["seg3"], t["seg3fg"])])
     pw = len(path) * CW
     svg += f'<line x1="{x + 22:.0f}" y1="{y - 4.5}" x2="{W - pw - 12:.0f}" y2="{y - 4.5}" stroke="{t["line"]}"/>'
     svg += text(W, y, [(path, t["dim"], False)], anchor="end")
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="34" viewBox="0 0 {W} 34">{STYLE}{svg}</svg>'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">{STYLE}{svg}</svg>'
 
 
 # ================================================================ 3-1. 기술 스택 (아이콘 줄, 너비 가득)
@@ -385,52 +396,6 @@ def spotify(t, cfg, sp, now):
     return window(t, top + s + 18, "spotify", "\n  ".join(body), w=w)
 
 
-# ================================================================ 6. 오늘의 개발 명언 (작은 창 495px)
-QUOTES = [  # (명언, 말한 사람) — 날마다 하나씩 돌아가며 나온다
-    ("Talk is cheap. Show me the code.", "Linus Torvalds"),
-    ("Simplicity is prerequisite for reliability.", "Edsger W. Dijkstra"),
-    ("First, solve the problem. Then, write the code.", "John Johnson"),
-    ("Premature optimization is the root of all evil.", "Donald Knuth"),
-    ("Make it work, make it right, make it fast.", "Kent Beck"),
-    ("Programs must be written for people to read, and only incidentally for machines to execute.", "Harold Abelson"),
-    ("Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", "Martin Fowler"),
-    ("The best way to predict the future is to invent it.", "Alan Kay"),
-    ("Program testing can be used to show the presence of bugs, but never to show their absence.", "Edsger W. Dijkstra"),
-    ("Code is like humor. When you have to explain it, it's bad.", "Cory House"),
-    ("Before software can be reusable it first has to be usable.", "Ralph Johnson"),
-    ("Deleted code is debugged code.", "Jeff Sickel"),
-]
-
-
-def wrap(s, cells):
-    """단어 단위로 줄바꿈 (칸 수 기준)."""
-    lines, cur = [], ""
-    for word in s.split():
-        if cur and width(cur + " " + word) > cells:
-            lines.append(cur)
-            cur = word
-        else:
-            cur = (cur + " " + word).strip()
-    return lines + [cur] if cur else lines
-
-
-def fortune(t, now):
-    """❯ fortune dev / 왼쪽 분홍 막대 + 16px 문장(여러 줄) + 라벤더색 말한 사람"""
-    w, x0, fs, lh = 495, 18, 16, 24
-    q, who = QUOTES[now.toordinal() % len(QUOTES)]
-    tx = x0 + 16                                   # 막대 오른쪽 글자 시작
-    lines = wrap(q, int((w - tx - x0) / (fs * .6)))
-    top = 94
-    body = [text(x0, 60, [("❯ ", t["pink"], True), ("fortune dev", t["fg"], False)])]
-    for i, line in enumerate(lines):
-        body.append(text(tx, top + i * lh, [(line, t["fg"], True)], size=fs, delay=.2))
-    y = top + (len(lines) - 1) * lh + 26
-    body.append(text(tx, y, [("— " + who, t["lav"], False)], size=13, delay=.35))
-    body.append(f'<rect class="out" x="{x0}" y="{top - 16}" width="3" height="{y - top + 20}" rx="1.5" '
-                f'fill="{t["pink"]}" style="animation-delay: .2s"/>')
-    return window(t, y + 22, "fortune", "\n  ".join(body), w=w)
-
-
 # ================================================================ 6. 마무리
 def footer(t, cfg, now):
     p, cx = prompt(t, cfg, 60, now)
@@ -438,7 +403,7 @@ def footer(t, cfg, now):
             text(20, 88, [(cfg["footer"], t["pink"], True)], delay=1.0),
             text(20, 110, [("Saving session...completed.", t["dim"], False)], delay=1.3),
             text(20, 132, [("[Process completed]", t["dim"], False)], delay=1.6)]
-    return window(t, 150, f"{cfg['prompt']['user']} — zsh — 120×32", "\n  ".join(body))
+    return window(t, 150, f"{cfg['prompt']['user']} — zsh — 120×32", "\n  ".join(body), pad=GAP)
 
 
 # ================================================================ main
@@ -456,7 +421,7 @@ def main():
 
     for mode, t in THEMES.items():
         files = {"hero": hero(t, cfg, gh, art, now), "btop": btop(t, cfg, gh, now), "stack": stack(t, cfg, mode),
-                 "gitlog": gitlog(t, cfg, gh, now), "spotify": spotify(t, cfg, sp, now), "fortune": fortune(t, now),
+                 "gitlog": gitlog(t, cfg, gh, now), "spotify": spotify(t, cfg, sp, now),
                  "footer": footer(t, cfg, now)}
         for i, s in enumerate(cfg["sections"], 1):
             files[f"h{i:02d}"] = heading(t, f"{i:02d}", s["title"], s["path"])
