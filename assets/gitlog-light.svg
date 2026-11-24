@@ -19,16 +19,16 @@
   <circle cx="20" cy="17" r="6" fill="#ff5f57"/><circle cx="40" cy="17" r="6" fill="#febc2e"/><circle cx="60" cy="17" r="6" fill="#28c840"/>
   <text x="450" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#6a6a6a">git</text>
   <text class="m t" x="18.0" y="60" xml:space="preserve"><tspan fill="#c8458a" font-weight="700">❯ </tspan><tspan fill="#1f1f1f">git log --oneline -5</tspan></text>
-  <text class="m out" x="18.0" y="88" xml:space="preserve" font-size="13" style="animation-delay: 0.20s"><tspan fill="#7b5fb5">4129f04  </tspan><tspan fill="#1f1f1f">feat: 프로젝트 소개 글 3편과 프로젝트별 하위 카테고리 추가, 소개 페이지 자…</tspan></text>
+  <text class="m out" x="18.0" y="88" xml:space="preserve" font-size="13" style="animation-delay: 0.20s"><tspan fill="#7b5fb5">e45c942  </tspan><tspan fill="#1f1f1f">chore: 템플릿 예시 글 삭제와 README 카테고리 목록 갱신</tspan></text>
   <text class="m out" x="882.0" y="88" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.20s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
-  <text class="m out" x="18.0" y="108" xml:space="preserve" font-size="13" style="animation-delay: 0.25s"><tspan fill="#7b5fb5">f4302dc  </tspan><tspan fill="#1f1f1f">feat: 사이트 제목·소개·프로필 사진과 소개 페이지 정리, 프로젝트 탭을 카테…</tspan></text>
+  <text class="m out" x="18.0" y="108" xml:space="preserve" font-size="13" style="animation-delay: 0.25s"><tspan fill="#7b5fb5">c701468  </tspan><tspan fill="#1f1f1f">feat: CS·백엔드 공부 글 8편 추가 (HTTP와 HTTPS 외)</tspan></text>
   <text class="m out" x="882.0" y="108" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.25s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
-  <text class="m out" x="18.0" y="128" xml:space="preserve" font-size="13" style="animation-delay: 0.30s"><tspan fill="#7b5fb5">2a8ac3d  </tspan><tspan fill="#1f1f1f">feat: 사진 카테고리·사진 모아 보기·사이드바 카테고리 접기 추가</tspan></text>
-  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
-  <text class="m out" x="18.0" y="148" xml:space="preserve" font-size="13" style="animation-delay: 0.35s"><tspan fill="#7b5fb5">28c788c  </tspan><tspan fill="#1f1f1f">feat: 글 댓글·반응(giscus)과 조회수(Vercount) 추가</tspan></text>
-  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
-  <text class="m out" x="18.0" y="168" xml:space="preserve" font-size="13" style="animation-delay: 0.40s"><tspan fill="#7b5fb5">19d17f1  </tspan><tspan fill="#1f1f1f">feat: CS·백엔드 공부 글 8편 추가</tspan></text>
-  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#8a8a8a">artiffect.github.io · 1d</tspan></text>
+  <text class="m out" x="18.0" y="128" xml:space="preserve" font-size="13" style="animation-delay: 0.30s"><tspan fill="#7b5fb5">4129f04  </tspan><tspan fill="#1f1f1f">feat: 프로젝트 소개 글 3편과 프로젝트별 하위 카테고리 추가, 소개 페이지 자…</tspan></text>
+  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#8a8a8a">artiffect.github.io · 2d</tspan></text>
+  <text class="m out" x="18.0" y="148" xml:space="preserve" font-size="13" style="animation-delay: 0.35s"><tspan fill="#7b5fb5">f4302dc  </tspan><tspan fill="#1f1f1f">feat: 사이트 제목·소개·프로필 사진과 소개 페이지 정리, 프로젝트 탭을 카테…</tspan></text>
+  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#8a8a8a">artiffect.github.io · 2d</tspan></text>
+  <text class="m out" x="18.0" y="168" xml:space="preserve" font-size="13" style="animation-delay: 0.40s"><tspan fill="#7b5fb5">2a8ac3d  </tspan><tspan fill="#1f1f1f">feat: 사진 카테고리·사진 모아 보기·사이드바 카테고리 접기 추가</tspan></text>
+  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#8a8a8a">artiffect.github.io · 2d</tspan></text>
   <rect x="1" y="1" width="898" height="188" rx="10" fill="none" stroke="#d0d0d0"/>
   </g>
 </svg>
