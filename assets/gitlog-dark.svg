@@ -19,16 +19,16 @@
   <circle cx="20" cy="17" r="6" fill="#ff5f57"/><circle cx="40" cy="17" r="6" fill="#febc2e"/><circle cx="60" cy="17" r="6" fill="#28c840"/>
   <text x="450" y="21" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#9a9a9a">git</text>
   <text class="m t" x="18.0" y="60" xml:space="preserve"><tspan fill="#f08ac0" font-weight="700">❯ </tspan><tspan fill="#e6e6e6">git log --oneline -5</tspan></text>
-  <text class="m out" x="18.0" y="88" xml:space="preserve" font-size="13" style="animation-delay: 0.20s"><tspan fill="#c3a6e6">f1ff5ac  </tspan><tspan fill="#e6e6e6">chore: 구글 서치 콘솔 소유 확인 메타 태그 추가</tspan></text>
-  <text class="m out" x="882.0" y="88" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.20s"><tspan fill="#7a7a7a">artiffect.github.io · 8h</tspan></text>
-  <text class="m out" x="18.0" y="108" xml:space="preserve" font-size="13" style="animation-delay: 0.25s"><tspan fill="#c3a6e6">2e59a9e  </tspan><tspan fill="#e6e6e6">feat: 코딩테스트 글 4편 추가 (LeetCode Blind 75)</tspan></text>
-  <text class="m out" x="882.0" y="108" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.25s"><tspan fill="#7a7a7a">artiffect.github.io · 10h</tspan></text>
-  <text class="m out" x="18.0" y="128" xml:space="preserve" font-size="13" style="animation-delay: 0.30s"><tspan fill="#c3a6e6">b453ebe  </tspan><tspan fill="#e6e6e6">solve: 238. Product of Array Except Self 풀이 추가</tspan></text>
-  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#7a7a7a">leetcode · 10h</tspan></text>
-  <text class="m out" x="18.0" y="148" xml:space="preserve" font-size="13" style="animation-delay: 0.35s"><tspan fill="#c3a6e6">b8ec4c6  </tspan><tspan fill="#e6e6e6">chore: Zed 및 Java 로컬 설정 파일 gitignore 추가</tspan></text>
-  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#7a7a7a">leetcode · 10h</tspan></text>
-  <text class="m out" x="18.0" y="168" xml:space="preserve" font-size="13" style="animation-delay: 0.40s"><tspan fill="#c3a6e6">ac425f1  </tspan><tspan fill="#e6e6e6">solve: 217. Contains Duplicate 풀이 추가</tspan></text>
-  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#7a7a7a">leetcode · 12h</tspan></text>
+  <text class="m out" x="18.0" y="88" xml:space="preserve" font-size="13" style="animation-delay: 0.20s"><tspan fill="#c3a6e6">ad08708  </tspan><tspan fill="#e6e6e6">feat: 코딩테스트 글 추가 (LeetCode 53. Maximum Subarray)</tspan></text>
+  <text class="m out" x="882.0" y="88" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.20s"><tspan fill="#7a7a7a">artiffect.github.io · 19h</tspan></text>
+  <text class="m out" x="18.0" y="108" xml:space="preserve" font-size="13" style="animation-delay: 0.25s"><tspan fill="#c3a6e6">c09b215  </tspan><tspan fill="#e6e6e6">solve: 53. Maximum Subarray 풀이 추가</tspan></text>
+  <text class="m out" x="882.0" y="108" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.25s"><tspan fill="#7a7a7a">leetcode · 19h</tspan></text>
+  <text class="m out" x="18.0" y="128" xml:space="preserve" font-size="13" style="animation-delay: 0.30s"><tspan fill="#c3a6e6">f1ff5ac  </tspan><tspan fill="#e6e6e6">chore: 구글 서치 콘솔 소유 확인 메타 태그 추가</tspan></text>
+  <text class="m out" x="882.0" y="128" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.30s"><tspan fill="#7a7a7a">artiffect.github.io · 1d</tspan></text>
+  <text class="m out" x="18.0" y="148" xml:space="preserve" font-size="13" style="animation-delay: 0.35s"><tspan fill="#c3a6e6">2e59a9e  </tspan><tspan fill="#e6e6e6">feat: 코딩테스트 글 4편 추가 (LeetCode Blind 75)</tspan></text>
+  <text class="m out" x="882.0" y="148" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.35s"><tspan fill="#7a7a7a">artiffect.github.io · 1d</tspan></text>
+  <text class="m out" x="18.0" y="168" xml:space="preserve" font-size="13" style="animation-delay: 0.40s"><tspan fill="#c3a6e6">b453ebe  </tspan><tspan fill="#e6e6e6">solve: 238. Product of Array Except Self 풀이 추가</tspan></text>
+  <text class="m out" x="882.0" y="168" xml:space="preserve" font-size="13" text-anchor="end" style="animation-delay: 0.40s"><tspan fill="#7a7a7a">leetcode · 1d</tspan></text>
   <rect x="1" y="1" width="898" height="188" rx="10" fill="none" stroke="#333333"/>
   </g>
 </svg>
